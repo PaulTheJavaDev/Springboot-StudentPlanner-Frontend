@@ -1,6 +1,6 @@
 class UserAPI {
-    constructor(baseUrl) {
-        this.baseUrl = baseUrl;
+    constructor() {
+        this.baseUrl = "http://localhost:8080/auth";
         this.sessionID = null;
     }
 
@@ -38,7 +38,7 @@ class UserAPI {
 
 class App {
     constructor() {
-        this.api = new UserAPI("http://localhost:8080/auth");
+        this.api = new UserAPI();
         this.bindUI();
     }
 
