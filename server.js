@@ -1,13 +1,14 @@
 const express = require('express');
 const path = require('path');
-
 const app = express();
 const port = 3000;
-const appURL = `http://localhost:${port}`;
 
 app.use(express.json());
+app.use('/public', express.static(path.join(__dirname, 'public')));
 
-// Statische Dateien aus dem public-Ordner
-app.use(express.static(path.join(__dirname, 'public')));
+// Direct root URL to login page
+app.get('/', (req, res) => {
+    res.redirect('/public/login/index.html');
+});
 
-app.listen(port, () => console.log(`Server läuft auf ${appURL}`));
+app.listen(port);

@@ -26,6 +26,11 @@ body {
     cursor: pointer;
 }
 
+#register button {
+    position: relative;
+    cursor: pointer;
+}
+
 #loginResult {
     margin-top: 10px;
     color: green;
