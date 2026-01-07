@@ -1,7 +1,53 @@
+:root {
+    --cornerRadius: 10px;
+    --lesson-bg-color: rgb(225, 225, 225);
+    --break-bg-color: var(--lesson-bg-color);
+    --font: bold 16px Arial, sans-serif;
+}
+
 #PageTitle {
     margin: auto;
     padding: 10px;
     text-align: center;
 
     font: bold 30px Arial, sans-serif;
+}
+
+.daysContainer {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.hoursContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.lesson {
+    width: 200px;
+    height: 100px;
+    background-color: var(--lesson-bg-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font: var(--font);
+    padding: 10px;
+    border-radius: var(--cornerRadius);
+}
+
+.break {
+    width: 200px;
+    height: 35px;
+    background-color: var(--break-bg-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font: var(--font);
+    padding: 10px;
+    border-radius: var(--cornerRadius);
 }
