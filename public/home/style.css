@@ -1,15 +1,12 @@
 :root {
     --cornerRadius: 10px;
-    --lesson-bg-color: rgb(225, 225, 225);
-    --break-bg-color: var(--lesson-bg-color);
+    --lesson-bg-color: rgb(188,169,225);
+    --break-bg-color: rgb(231,236,163);
     --font: bold 16px Arial, sans-serif;
 }
 
-#PageTitle {
-    margin: auto;
-    padding: 10px;
+.PageTitle {
     text-align: center;
-
     font: bold 30px Arial, sans-serif;
 }
 
@@ -50,4 +47,37 @@
     font: var(--font);
     padding: 10px;
     border-radius: var(--cornerRadius);
+}
+
+.editButton {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 25px;
+    height: 25px;
+    padding: 0;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 7.5px;
+}
+
+.DayHeader {
+    text-align: center;
+    font: bold 20px Arial, sans-serif;
+}
+
+.addLesson, .addBreak {
+    font: bold 14px Arial, sans-serif;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.contextMenu {
+    display: flex;
+    position: absolute;
+    background-color: white;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    z-index: 999;
+    border-radius: 6px;
 }
