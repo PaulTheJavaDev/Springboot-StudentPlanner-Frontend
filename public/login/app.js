@@ -8,35 +8,22 @@ class UserAPI {
 
     async login(username, password) {
 
-        console.log("=== Sending Login Request ===");
-
-
         const loginURL = `${this.baseUrl}/login`;
-        try {
-            const result = await fetch(loginURL, {
+
+        const result = await fetch(loginURL, {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify({username, password})
             });
 
-            console.log("Response Status:", result.status, result.statusText);
-
-            const data = await result.json().catch(() => {
-                console.log("Response could not be parsed as JSON.");
-                return null;
-            });
-
-            console.log("Data received:", data);
-
             if (!result.ok) throw new Error("Login failed: " + result.statusText);
 
-            this.sessionID = data.sessionID;
-            return data;
+            const data = await result.json();
 
-        } catch (error) {
-            console.error("Fetch Error:", error);
-            throw error;
-        }
+            this.sessionID = data.sessionID;
+            sessionStorage.setItem("SessionID", data.sessionID);
+
+            return data;
     }
 
     async register(username, password) {
