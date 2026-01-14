@@ -3,30 +3,84 @@ const API_URL = `${window.location.protocol}//${window.location.hostname}:8080`;
 const API_BASE_URL = `${API_URL}/schedule/me`;
 const sessionID = sessionStorage.getItem('SessionID');
 
-// Redirect to login if no sessionID
+// Redirect to login if no SessionID
 if (!sessionID) {
     window.location.href = '/public/login/index.html';
 }
 
 // GET request to fetch schedule data
 async function apiGet() {
-    const res = await fetch(API_BASE_URL, {
+
+    const result = await fetch(API_BASE_URL, {
+
         method: 'GET',
         headers: { 'SessionID': sessionID }
+
     });
-    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-    return res.json();
+
+    if (!result.ok) throw new Error(`HTTP error! status: ${result.status}`);
+    return result.json();
 }
 
-// PUT request to save day data
-async function apiPut(url, body) {
-    const res = await fetch(url, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json', 'SessionID': sessionID },
-        body: JSON.stringify(body)
+async function apiDeleteTimeStamp(dayOfWeek, timestampID) {
+
+    const result = await fetch(`${API_BASE_URL}/${dayOfWeek}/${timestampID}`, {
+
+        method: 'DELETE',
+        headers: { 'SessionID': sessionID }
+
     });
+
+    if (!result.ok) throw new Error(`HTTP error! status: ${result.status}`);
+    console.log("Successfully deleted timestamp");
+}
+
+// Data Creation
+async function apiCreateTimeStamp(dayOfWeek, type, text) {
+
+    const res = await fetch(`${API_BASE_URL}/${dayOfWeek}`, {
+
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'SessionID': sessionID },
+        body: JSON.stringify({ type, text })
+
+    });
+
     if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-    return res.json();
+    return await res.json();
+
+}
+
+async function apiUpdateTimeStamp(dayOfWeek, timestampID, data) {
+
+    const res = await fetch(`${API_BASE_URL}/${dayOfWeek}/${timestampID}`, {
+
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'SessionID': sessionID },
+        body: JSON.stringify(data)
+
+    });
+
+    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+    return await res.json();
+
+}
+
+async function getSubjects() {
+
+    const res = await fetch(`${API_URL}/subjects`, {
+        method: 'GET',
+        headers: {
+            'SessionID': sessionID
+        }
+    });
+
+    if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+    }
+
+    return await res.json();
+    
 }
 
 // Context menu creation
@@ -45,6 +99,10 @@ function createMenu(options, button) {
     });
 
     document.body.appendChild(menu);
+    menu.style.position = 'absolute';
+    menu.style.top = '0';
+    menu.style.left = '100%';
+    menu.style.display = 'none';
 
     // Show menu
     button.onclick = () => {
@@ -65,9 +123,8 @@ function createMenu(options, button) {
     return menu;
 }
 
-// Create Timestamp Element
+// Create Timestamp Element | Data -> Element
 function createTimeStampElement(dayOfWeek, data) {
-
     const div = document.createElement('div');
     div.className = data.type;
     div.dataset.type = data.type;
@@ -80,63 +137,57 @@ function createTimeStampElement(dayOfWeek, data) {
 
     const editButton = document.createElement('button');
     editButton.className = 'editButton';
-    editButton.textContent = '⋮'; // three-dot menu
+    editButton.textContent = '⋮';
     div.appendChild(editButton);
 
-    // Context Menu Options
     const options = [];
+
     if (data.type === 'lesson') {
-    options.push({
-        label: 'Edit',
-        action: async () => {
-            // Get available Subjects
-            const lessonOptions = await getSubjects();
+        options.push({
+            label: 'Edit',
+            action: async () => {
+                const lessonOptions = await getSubjects();
+                const select = document.createElement('select');
 
-            // Create select element
-            const select = document.createElement('select');
-            lessonOptions.forEach(name => {
-                const option = document.createElement('option');
-                option.value = name;
-                option.textContent = name;
-                
-                // Set selected option
-                if (name === span.textContent) {
-                    option.selected = true;
-                }
-            
-                select.appendChild(option);
-            });
+                lessonOptions.forEach(name => {
+                    const option = document.createElement('option');
+                    option.value = name;
+                    option.textContent = name;
+                    if (name === span.textContent) option.selected = true;
+                    select.appendChild(option);
+                });
 
-            // Replace span with select
-            span.replaceWith(select);
-            select.focus();
+                span.replaceWith(select);
+                select.focus();
 
-            // Save selection
-            const saveSelection = async () => {
-                span.textContent = select.value;
-                select.replaceWith(span);
-                await saveDay(dayOfWeek);
-            };
+                const saveSelection = async () => {
+                    span.textContent = select.value;
+                    select.replaceWith(span);
+                    await apiUpdateTimeStamp(dayOfWeek, data.id, { text: select.value });
+                };
 
-            select.addEventListener('change', saveSelection);
-            select.addEventListener('blur', saveSelection);
-        }
-    });
-}
+                select.addEventListener('change', saveSelection);
+                select.addEventListener('blur', saveSelection);
+            }
+        });
+    }
 
-    // Delete option
-    options.push({
-        label: 'Delete',
-        action: async () => {
-            div.remove();
-            await saveDay(dayOfWeek);
-        }
-    });
+    // Menü **zuerst erstellen**, bevor Delete hinzugefügt wird
+    const menu = createMenu(options, editButton);
 
-    createMenu(options, editButton);
+    // Jetzt Delete-Option hinzufügen
+    const deleteBtn = document.createElement('button');
+    deleteBtn.textContent = 'Delete';
+    deleteBtn.onclick = async () => {
+        div.remove();
+        menu.remove();
+        await apiDeleteTimeStamp(dayOfWeek, data.id);
+    };
+    menu.appendChild(deleteBtn);
 
     return div;
 }
+
 
 // Load Schedule
 async function loadSchedule() {
@@ -154,50 +205,17 @@ async function loadSchedule() {
             });
         });
     } catch (err) {
-        console.error('Error loading schedule:', err);
+        console.error('Error loading schedule: ', err);
     }
 }
 
-// Get Subjects
-async function getSubjects() {
-
-    const result = await fetch(`${API_URL}/subjects`, {
-        method: 'GET',
-        headers: {
-            'SessionID': sessionID
-        }
-    });
-
-    if (!result.ok) {
-        throw new Error(`HTTP error! status: ${result.status}`);
-    }
-
-    return await result.json();
-}
-
-// Save Day
-async function saveDay(dayOfWeek) {
-    const container = document.getElementById(dayOfWeek);
-    const timeStamps = Array.from(container.querySelectorAll('.lesson, .break')).map(el => {
-        const span = el.querySelector('span');
-        return {
-            type: el.dataset.type,
-            text: span ? span.textContent : ''
-        };
-    });
-    await apiPut(`${API_BASE_URL}/${dayOfWeek}`, { timeStamps });
-}
-
-// Add Timestamp
 async function addItem(dayOfWeek, type) {
-    const container = document.getElementById(dayOfWeek);
-    const newTimeStamp = createTimeStampElement(dayOfWeek, {
-        type,
-        text: type === 'lesson' ? 'Lesson' : 'Break'
-    });
 
-    container.appendChild(newTimeStamp);
-    await saveDay(dayOfWeek);
+    const container = document.getElementById(dayOfWeek);
+    const timestamp = await apiCreateTimeStamp(dayOfWeek, type, type === 'lesson' ? 'Lesson' : 'Break');
+
+    container.appendChild(createTimeStampElement(dayOfWeek, timestamp));
+
 }
 
 // Bindings
