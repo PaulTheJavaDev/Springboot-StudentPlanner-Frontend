@@ -10,79 +10,66 @@ if (!sessionID) {
 
 // GET request to fetch schedule data
 async function apiGet() {
-
     const result = await fetch(API_BASE_URL, {
-
         method: 'GET',
-        headers: { 'SessionID': sessionID }
-
+        headers: {
+            'SessionID': sessionID
+        }
     });
-
     if (!result.ok) throw new Error(`HTTP error! status: ${result.status}`);
     return result.json();
 }
 
 async function apiDeleteTimeStamp(dayOfWeek, timestampID) {
-
     const result = await fetch(`${API_BASE_URL}/${dayOfWeek}/${timestampID}`, {
-
         method: 'DELETE',
-        headers: { 'SessionID': sessionID }
-
+        headers: {
+            'SessionID': sessionID
+        }
     });
-
     if (!result.ok) throw new Error(`HTTP error! status: ${result.status}`);
     console.log("Successfully deleted timestamp");
 }
 
 // Data Creation
 async function apiCreateTimeStamp(dayOfWeek, type, text) {
-
     const res = await fetch(`${API_BASE_URL}/${dayOfWeek}`, {
-
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'SessionID': sessionID },
+        headers: {
+            'Content-Type': 'application/json',
+            'SessionID': sessionID
+        },
         body: JSON.stringify({ type, text })
-
     });
-
     if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
     return await res.json();
-
 }
 
 async function apiUpdateTimeStamp(dayOfWeek, timestampID, data) {
-
     const res = await fetch(`${API_BASE_URL}/${dayOfWeek}/${timestampID}`, {
-
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json', 'SessionID': sessionID },
+        headers: {
+            'Content-Type': 'application/json',
+            'SessionID': sessionID
+        },
         body: JSON.stringify(data)
-
     });
-
     console.log(data);
-
     if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
     return await res.json();
-
 }
 
 async function getSubjects() {
-
     const res = await fetch(`${API_URL}/subjects`, {
         method: 'GET',
         headers: {
             'SessionID': sessionID
         }
     });
-
     if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`);
     }
-
     return await res.json();
-    
 }
 
 // Context menu creation
@@ -119,6 +106,7 @@ function createMenu(options, button) {
                 document.removeEventListener('click', handleClickOutside);
             }
         };
+
         document.addEventListener('click', handleClickOutside);
     };
 
@@ -162,13 +150,15 @@ function createTimeStampElement(dayOfWeek, data) {
                 span.replaceWith(select);
                 select.focus();
 
-                const saveSelection = async () => {
+                const restoreSpan = async () => {
                     span.textContent = select.value;
-                    select.replaceWith(span);
                     await apiUpdateTimeStamp(dayOfWeek, data.id, { text: select.value });
+                    data.text = select.value;
+                    select.replaceWith(span);
                 };
 
-                select.addEventListener('change', saveSelection);
+                select.addEventListener('change', restoreSpan);
+                select.addEventListener('blur', restoreSpan);
             }
         });
     }
@@ -192,6 +182,7 @@ function createTimeStampElement(dayOfWeek, data) {
 async function loadSchedule() {
     try {
         const days = await apiGet();
+
         days.forEach(day => {
             const container = document.getElementById(day.dayOfWeek);
             if (!container) return;
@@ -199,7 +190,10 @@ async function loadSchedule() {
             // Clear old elements
             container.querySelectorAll('.lesson, .break').forEach(e => e.remove());
 
-            day.timeStamps.forEach(timestamp => {
+            // Sort timestamps by ID before rendering
+            const sortedTimestamps = [...day.timeStamps].sort((a, b) => a.id - b.id);
+            
+            sortedTimestamps.forEach(timestamp => {
                 container.appendChild(createTimeStampElement(day.dayOfWeek, timestamp));
             });
         });
@@ -209,15 +203,12 @@ async function loadSchedule() {
 }
 
 async function addItem(dayOfWeek, type) {
-
     const container = document.getElementById(dayOfWeek);
     const timestamp = await apiCreateTimeStamp(dayOfWeek, type, type === 'lesson' ? 'Lesson' : 'Break');
-
     container.appendChild(createTimeStampElement(dayOfWeek, timestamp));
-
 }
 
-// Bindings
+// Bindings //
 document.querySelectorAll('.addLesson').forEach(button => {
     button.onclick = e => addItem(e.target.closest('.hoursContainer').id, 'lesson');
 });
@@ -232,10 +223,9 @@ document.querySelectorAll('.assignmentsButton').forEach(button => {
     };
 });
 
-document.getElementsByClassName('logoutButton')[0].onclick = () => {
+document.getElementById('logoutButton').onclick = () => {
     sessionStorage.removeItem('SessionID');
     window.location.href = '/public/login/index.html';
 }
 
-// Initialisation
 window.addEventListener('DOMContentLoaded', loadSchedule);
