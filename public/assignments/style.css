@@ -1,0 +1,176 @@
+:root {
+
+    --link-color: #838383;
+}
+
+.PageTitle {
+    text-align: center;
+    font-family: Arial, Helvetica, sans-serif;
+    margin-top: 20px;
+}
+
+.pageContainer {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    padding: 20px;
+    margin: 20px;
+    gap: 20px;
+    width: 90%;
+    height: 600px;
+}
+
+.assignmentCreator {
+    border: rgba(0, 0, 0, 0.1) solid 2px;
+    padding: 20px;
+    width: 35%;
+    height: 80%;
+    box-sizing: border-box;
+    text-align: center;
+    border-radius: 10px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.assignmentsContainer {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+
+    border: rgba(0, 0, 0, 0.1) solid 2px;
+    padding: 20px;
+    gap: 20px;
+    width: 90%;
+    height: 560px;
+    border-radius: 10px;
+}
+
+.assignment {
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    position: relative;
+    width: 185px;
+    height: 185px;
+}
+
+.assignment-subject {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 1.2em;
+    text-align: center;
+}
+
+.assignment-due-date,
+.assignment-completed,
+.assignment-notes {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: medium;
+    color: #555;
+    text-align: center;
+}
+
+.subjectOption {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 14px;
+    color: #000;
+    background-color: #fff;
+}
+
+.subjectSelect, .dueDateInput, .assignmentNotes {
+    width: 150px;
+    height: 32px;
+    padding: 4px 8px;
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 14px;
+    text-align: center;
+
+    border: 1px solid #ccc;
+    border-radius: 6px;
+
+    align-self: center;
+}
+
+.submitAssignment {
+
+    width: 150px;
+    height: 32px;
+    padding: 4px 8px;
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 14px;
+    text-align: center;
+
+    border: 1px solid #ccc;
+    border-radius: 6px;
+
+    align-self: center;
+}
+
+.assignment-menu-button {
+    margin-top: 10px;
+    padding: 6px 12px;
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 14px;
+    text-align: center;
+
+    border: 1px solid #ccc;
+    border-radius: 6px;
+
+    cursor: pointer;
+}
+
+.assignment-menu-button {
+    cursor: pointer;
+    font-size: 18px;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.assignment-popup {
+    background-color: white;
+    border: 1px solid #ccc;
+    padding: 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    z-index: 100;
+
+    position: absolute;
+    top: 55px;
+    left: 165px;
+    border-radius: 6px;
+    box-shadow: 1px 1px 5px rgba(0,0,0,0.2);
+}
+
+.returnLink {
+    /* Positioning */
+    position: fixed;
+    top: 25px;
+    right: 375px;
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 14px;
+    color: var(--link-color);
+    text-decoration: underline;
+}
+
+.assignmentsLink {
+
+    /* Positioning */
+    position: fixed;
+    top: 25px;
+    right: 285px;
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 14px;
+    color: var(--link-color);
+    text-decoration: underline;
+    pointer-events: none;
+
+}

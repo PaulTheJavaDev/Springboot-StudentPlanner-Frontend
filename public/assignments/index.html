@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assignments</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <h1 class="PageTitle">My Assignments</h1>
+
+    <div class="pageContainer">
+
+        <div class="assignmentCreator">
+
+            <p class="creatorTitle">Create an Assignment</p>
+
+            <p id="responseLabel"></p>
+
+            <select id="subjectSelect" class="subjectSelect">
+                <option value="" disabled>Select a Subject</option>
+            </select>
+
+            <input type="date" class="dueDateInput" id="dueDateInput" placeholder="Due Date">
+            <input type="text" class="assignmentNotes" id="assignmentNotes" placeholder="Your notes">
+            <button class="submitAssignment" id="submitAssignment" >Create Assignment</button>
+
+        </div>
+
+        <div class="assignmentsContainer"></div>
+
+    </div>
+
+    <a href="/public/home/index.html" class="returnLink">Home</a>
+    <a class="assignmentsLink" aria-disabled="true">/ Assignments</a>
+
+    <script src="app.js"></script>
+</body>
+</html>

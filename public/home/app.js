@@ -55,11 +55,13 @@ async function apiUpdateTimeStamp(dayOfWeek, timestampID, data) {
 
     const res = await fetch(`${API_BASE_URL}/${dayOfWeek}/${timestampID}`, {
 
-        method: 'PATCH',
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json', 'SessionID': sessionID },
         body: JSON.stringify(data)
 
     });
+
+    console.log(data);
 
     if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
     return await res.json();
@@ -167,15 +169,12 @@ function createTimeStampElement(dayOfWeek, data) {
                 };
 
                 select.addEventListener('change', saveSelection);
-                select.addEventListener('blur', saveSelection);
             }
         });
     }
 
-    // Menü **zuerst erstellen**, bevor Delete hinzugefügt wird
     const menu = createMenu(options, editButton);
 
-    // Jetzt Delete-Option hinzufügen
     const deleteBtn = document.createElement('button');
     deleteBtn.textContent = 'Delete';
     deleteBtn.onclick = async () => {
@@ -226,6 +225,17 @@ document.querySelectorAll('.addLesson').forEach(button => {
 document.querySelectorAll('.addBreak').forEach(button => {
     button.onclick = e => addItem(e.target.closest('.hoursContainer').id, 'break');
 });
+
+document.querySelectorAll('.assignmentsButton').forEach(button => {
+    button.onclick = () => {
+        window.location.href = '/public/assignments/index.html';
+    };
+});
+
+document.getElementsByClassName('logoutButton')[0].onclick = () => {
+    sessionStorage.removeItem('SessionID');
+    window.location.href = '/public/login/index.html';
+}
 
 // Initialisation
 window.addEventListener('DOMContentLoaded', loadSchedule);
