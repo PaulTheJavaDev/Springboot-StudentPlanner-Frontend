@@ -1,8 +1,6 @@
-const SessionID = sessionStorage.getItem("SessionID");
+import { validateSessionAuth, getSessionID } from "/modules/Security.js";
 
-if (!SessionID) {
-    window.location.href = "/public/login/index.html";
-}
+validateSessionAuth();
 
 // URLs
 const HOST_URL = "http://localhost:8080";
@@ -40,7 +38,7 @@ async function getAssignments() {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
-            "SessionID": SessionID
+            "SessionID": getSessionID()
         }
     });
 
@@ -59,7 +57,7 @@ async function createAssignmentMetaData(body) {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
-            "SessionID": SessionID
+            "SessionID": getSessionID()
         },
         body: JSON.stringify(body)
     });
@@ -86,7 +84,7 @@ async function updateAssignment(assignmentId, body) {
         method: "PUT",
         headers: {
             "Content-Type": "application/json",
-            "SessionID": SessionID
+            "SessionID": getSessionID()
         },
         body: JSON.stringify(body)
 
@@ -107,7 +105,7 @@ async function deleteAssignment(assignmentId) {
         method: "DELETE",
         headers: {
             "Content-Type": "application/json",
-            "SessionID": SessionID
+            "SessionID": getSessionID()
         }
     });
 
@@ -125,8 +123,8 @@ function createLabeledParagraph(label, value, className) {
 
 function responseLabelHandler(responseText, durationInSeconds) {
 
-    durationInSeconds = durationInSeconds || 2; // Default to 2000ms if duration is not provided
-    durationInSeconds = durationInSeconds * 1000; // Convert to milliseconds
+    durationInSeconds = durationInSeconds || 2;
+    durationInSeconds = durationInSeconds * 1000;
     const responseLabel = document.getElementById("responseLabel");
     responseLabel.textContent = responseText;
     setTimeout(() => {
@@ -137,13 +135,12 @@ function responseLabelHandler(responseText, durationInSeconds) {
 // Assignment Element Creation
 function createAssignmentElement(data) {
 
-    // Create assignment wrapper
     const wrapper = document.createElement("div");
     wrapper.classList.add("assignment");
 
     const subject = document.createElement("h3");
     subject.classList.add("assignment-subject");
-    subject.textContent = data.subject; // TODO: Format subject properly: MATH -> Math
+    subject.textContent = data.subject;
 
     const dueDate = createLabeledParagraph("Due date", new Date(data.dueDate).toLocaleDateString(), "assignment-due-date");
     const notes = createLabeledParagraph("Notes", data.notes, "assignment-notes");

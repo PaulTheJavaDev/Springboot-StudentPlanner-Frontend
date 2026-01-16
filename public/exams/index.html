@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Assignments</title>
+    <title>Exams</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -14,33 +14,32 @@
     <div class="navRight">
         <a href="/public/home/index.html" class="navLink">Home</a>
         <span class="navDivider">/</span>
-        <span class="navCurrent">Assignments</span>
+        <span class="navCurrent">Exams</span>
     </div>
 </header>
 
-<h1 class="PageTitle">My Assignments</h1>
+<h1 class="PageTitle">My Exams</h1>
 
 <div class="pageContainer">
 
-    <div class="assignmentCreator">
+    <div class="examCreator">
 
-        <p class="creatorTitle">Create an Assignment</p>
-        <p id="responseLabel"></p>
+        <p class="creatorTitle">Create an Exam</p>
+        <p class="responseLabel" id="responseLabel"></p>
 
         <select id="subjectSelect" class="subjectSelect">
             <option value="" disabled selected>Select a Subject</option>
         </select>
 
         <input type="date" class="dueDateInput" id="dueDateInput">
-        <input type="text" class="assignmentNotes" id="assignmentNotes" placeholder="Your notes">
-        <button class="submitAssignment" id="submitAssignment">Create Assignment</button>
+        <input type="text" class="examNotes" id="examNotes" placeholder="Your notes">
+        <button class="submitExam" id="submitExam">Create Exam</button>
 
     </div>
 
-    <div class="assignmentsContainer"></div>
-
+    <div class="examsContainer" id="examsContainer"></div>
 </div>
 
-<script type="module" src="app.js"></script>
+    <script type="module" src="app.js"></script>
 </body>
 </html>

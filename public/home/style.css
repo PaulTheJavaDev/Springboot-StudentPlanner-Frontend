@@ -2,81 +2,108 @@
     --cornerRadius: 10px;
     --lesson-bg-color: rgb(188,169,225);
     --break-bg-color: rgb(231,236,163);
-    --font: bold 16px Arial, sans-serif;
+    --font: bold 1rem Arial, sans-serif;
 }
 
+/* Top Bar */
+.topBar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+}
+
+.navCurrent {
+    font-size: 0.9rem;
+    color: #838383;
+    text-decoration: underline;
+    pointer-events: none;
+    font: 0.875rem Arial, sans-serif;
+}
+
+.logoutButton {
+    font: bold 0.9rem Arial, sans-serif;
+    border-radius: 4px;
+    cursor: pointer;
+    padding: 0.3rem 0.6rem;
+    border: 1.75px solid #7e7c7c;
+}
+
+/* Page */
 .PageTitle {
     text-align: center;
-    font: bold 30px Arial, sans-serif;
+    font: bold 2rem Arial, sans-serif;
+    margin-bottom: 1rem;
 }
 
+/* Navigation buttons */
+.buttonContainer {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Days */
 .daysContainer {
     display: flex;
-    gap: 20px;
+    gap: 1.5rem;
     justify-content: center;
     align-items: flex-start;
-    width: 1000px;
-    height: 450px;
+    max-width: 100%;
     overflow-x: auto;
-    overflow-y: hidden;
-    margin: 0 auto;
-    padding: 20px;
+    padding: 1.5rem;
 }
 
 .hoursContainer {
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    width: 200px;
-    height: 250px;
-    padding: 10px;
+    gap: 0.5rem;
+    min-width: 12rem;
     align-items: center;
-    margin-bottom: 20px;
+}
+
+.DayHeader {
+    font: bold 1.2rem Arial, sans-serif;
+}
+
+/* Entries */
+.lesson,
+.break {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font: var(--font);
+    padding: 0.6rem;
+    border-radius: var(--cornerRadius);
+    position: relative;
 }
 
 .lesson {
-    width: 200px;
-    height: 100px;
     background-color: var(--lesson-bg-color);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font: var(--font);
-    padding: 10px;
-    border-radius: var(--cornerRadius);
+    min-height: 5.5rem;
 }
 
 .break {
-    width: 200px;
-    height: 35px;
     background-color: var(--break-bg-color);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font: var(--font);
-    padding: 10px;
-    border-radius: var(--cornerRadius);
+    min-height: 2.2rem;
 }
 
 .editButton {
     position: absolute;
-    top: 5px;
-    right: 5px;
-    width: 25px;
-    height: 25px;
-    padding: 0;
-    font-size: 16px;
+    top: 0.3rem;
+    right: 0.3rem;
+    width: 1.5rem;
+    height: 1.5rem;
+    font-size: 1rem;
     cursor: pointer;
-    border-radius: 7.5px;
+    border-radius: 35%;
 }
 
-.DayHeader {
-    text-align: center;
-    font: bold 20px Arial, sans-serif;
-}
-
-.addLesson, .addBreak {
-    font: bold 14px Arial, sans-serif;
+.addLesson,
+.addBreak {
+    font: bold 0.85rem Arial, sans-serif;
     border-radius: 6px;
     cursor: pointer;
 }
@@ -84,42 +111,9 @@
 .contextMenu {
     display: flex;
     position: absolute;
-    background-color: rgba(0, 0, 0, 0);
+    background-color: #fff;
     border: 1px solid #ccc;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-    z-index: 999;
+    z-index: 10;
     border-radius: 6px;
-}
-
-.logoutButton {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    font: bold 14px Arial, sans-serif;
-    border-radius: 4px;
-    cursor: pointer;
-    padding: 4px 4px;
-    border: 1.75px solid #7e7c7c;
-}
-
-.buttonContainer {
-    position: absolute;
-    bottom: 10px;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-}
-
-.homeLink {
-    /* Positioning */
-    position: fixed;
-    top: 12px;
-    right: 375px;
-
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 14px;
-    color: #838383;
-    text-decoration: underline;
-    pointer-events: none;
 }

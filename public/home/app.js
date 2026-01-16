@@ -223,6 +223,12 @@ document.querySelectorAll('.assignmentsButton').forEach(button => {
     };
 });
 
+document.querySelectorAll('.examsButton').forEach(button => {
+    button.onclick = () => {
+        window.location.href = '/public/exams/index.html';
+    };
+});
+
 document.getElementById('logoutButton').onclick = () => {
     sessionStorage.removeItem('SessionID');
     window.location.href = '/public/login/index.html';

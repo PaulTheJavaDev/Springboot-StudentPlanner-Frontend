@@ -103,8 +103,6 @@ class App {
         try {
             const result = await this.api.login(username, password);
             console.log("Login successful:", result);
-            feedbackElement.textContent = `Successful Login! SessionID: ${result.sessionID}`;
-
             window.location.href = "/public/home/index.html";
 
         } catch (err) {
