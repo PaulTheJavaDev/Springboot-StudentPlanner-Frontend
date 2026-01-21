@@ -7,9 +7,7 @@ const HOST_URL = "http://localhost:8080";
 const API_URL = `${HOST_URL}/assignments/my`;
 
 // Elements
-const assignmentContainer = document.getElementsByClassName("assignmentsContainer")[0];
-
-// API Calls //
+const assignmentContainer = document.querySelector(".assignmentsContainer");
 
 /* returns an String Array */
 async function getSubjects() {
@@ -222,7 +220,7 @@ async function loadSubjects() {
             const option = document.createElement("option");
             option.className = "subjectOption";
             option.value = subject;
-            option.textContent = subject;
+            //option.textContent = subject;
             subjectSelect.appendChild(option);
         });
     } catch (error) {
@@ -250,9 +248,11 @@ async function handleAssignmentFormSubmit(body) {
 }
 // Submit Button Click
 document.getElementById("submitAssignment").onclick = () => {
-    const subject = document.getElementById('subjectSelect').value.toUpperCase();
+    
+    const subject = document.getElementById('subjectSelect').value.toUpperCase().replace(" ", "_");
     const dueDate = document.getElementById('dueDateInput').value;
     const notes = document.getElementById('assignmentNotes').value;
+    const completed = false;
 
     if (!subject || !dueDate || !notes) {
         responseLabelHandler("Please fill in all fields.", 1.5);
@@ -262,13 +262,12 @@ document.getElementById("submitAssignment").onclick = () => {
     handleAssignmentFormSubmit({
         subject,
         dueDate,
+        completed,
         notes
     });
 }
 
 // Initial Load //
-
-// On DOM Content Loaded
 window.addEventListener("DOMContentLoaded", () => {
     loadAssignmentElements();
     loadSubjects();

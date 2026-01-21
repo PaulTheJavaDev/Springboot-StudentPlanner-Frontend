@@ -1,5 +1,23 @@
 :root {
     --link-color: #838383;
+    --primary-color: #007bff;
+    --danger-color: #dc3545;
+    --success-color: #28a745;
+    --border-color: #ccc;
+    --shadow-sm: 2px 2px 6px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.15);
+    --transition: all 0.2s ease;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: white;
 }
 
 .topBar {
@@ -7,6 +25,8 @@
     justify-content: flex-end;
     gap: 0.25rem;
     padding: 1.5rem 2rem;
+    background-color: white;
+    box-shadow: var(--shadow-sm);
 }
 
 .navLink,
@@ -17,14 +37,27 @@
     text-decoration: underline;
 }
 
-.navCurrent {
-    pointer-events: none;
+.navLink {
+    transition: var(--transition);
 }
 
+.navLink:hover {
+    color: var(--primary-color);
+    cursor: pointer;
+}
+
+.navCurrent {
+    pointer-events: none;
+    font-weight: 600;
+}
+
+/* Titles */
 .PageTitle {
     text-align: center;
     font-family: Arial, Helvetica, sans-serif;
-    margin: 1rem 0;
+    margin: 2rem 0 1rem;
+    font-size: 2rem;
+    color: black;
 }
 
 .creatorTitle {
@@ -32,8 +65,10 @@
     font-size: 1.25rem;
     font-weight: bold;
     margin-bottom: 0.5rem;
+    color: black;
 }
 
+/* Main Container */
 .pageContainer {
     display: flex;
     gap: 1.5rem;
@@ -41,67 +76,282 @@
     max-width: 100%;
 }
 
-.examCreator {
-    border: 2px solid rgba(0, 0, 0, 0.1);
-    padding: 1.25rem;
-    width: 25%;
-    min-width: 8rem;
-    border-radius: 10px;
+/* Exam Creator */
 
+.examCreator {
+    background: white;
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    width: 25%;
+    min-width: 280px;
+    border-radius: 12px;
+    box-shadow: var(--shadow-sm);
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 1rem;
     text-align: center;
+    height: fit-content;
+    position: sticky;
+    top: 1.5rem;
 }
 
 .examsContainer {
     display: flex;
     flex-wrap: wrap;
-    gap: 1.25rem;
+    gap: 1.5rem;
     flex: 1;
-
-    border: 2px solid rgba(0, 0, 0, 0.1);
     padding: 1.25rem;
-    border-radius: 10px;
+
+    background: white;
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    box-shadow: var(--shadow-sm);
+    align-content: flex-start;
+}
+
+.noExams {
+    width: 100%;
+    text-align: center;
+    color: var(--link-color);
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 1rem;
+    padding: 3rem;
+}
+
+.responseLabel {
+    font: 0.875rem Arial, Helvetica, sans-serif;
+    color: var(--danger-color);
+    min-height: 1.25rem;
+    font-weight: 600;
+    transition: var(--transition);
 }
 
 .subjectSelect,
 .dueDateInput,
-.examNotes,
-.submitExam {
-    width: 9.5rem;
-    height: 2rem;
-    padding: 0.25rem 0.5rem;
+.examNotes {
+    width: 100%;
+    height: 2.5rem;
+    padding: 0.5rem;
 
     font-family: Arial, Helvetica, sans-serif;
     font-size: 0.875rem;
-    text-align: center;
+    text-align: center; 
 
     border: 1px solid #ccc;
     border-radius: 6px;
-    align-self: center;
+    transition: var(--transition);
+}
+
+.subjectSelect:focus,
+.dueDateInput:focus,
+.examNotes:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px var(0, 123, 255, 0.1);
+}
+
+.examNotes {
+    text-align: left;
+    resize: vertical;
+    min-height: 4rem;
+}
+
+.submitExam {
+    width: 100%;
+    height: 2.5rem;
+
+    padding: 0.5rem;
+    margin-top: 0.5rem;
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.875rem;
+    font-weight: 600;
+
+    text-align: center;
+    background-color: var(--link-color);
+    color: white;
+    border: none;
+    border-radius: 6px;
+
+    transition: var(--transition);
+}
+
+.submitExam:hover {
+    cursor: pointer;
+    transform: rotate(-1deg);
+}
+
+.submitExam:active {
+    transform: scale(0.99);
 }
 
 .examCard {
+
+    position: relative;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    padding: 1.25rem;
+    width: 280px;
+    min-height: 180px;
 
+    background: white;
     font: 14px Arial, Helvetica, sans-serif;
-    
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    padding: 1rem;
-    width: 12rem;
-    height: 7rem;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    box-shadow: var(--shadow-sm);
 
-    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
+    transition: var(--transition);
 }
 
-.responseLabel {
-    font: 1.25rem Arial, Helvetica, sans-serif;
-    color: red;
-    height: 1.25rem;
-    font-weight: bold;
+.examCard:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+}
+
+/* h3 Header in the examcard */
+.examCard h3 {
+    font-size: 1rem;
+    color: black;
+    margin-bottom: 0.75rem;
+    text-align: center;
+}
+
+.examCard p {
+    font-size: 1rem;
+    color: #555555;
+    margin-bottom: 0.5rem;
+    line-height: 1.5;
+}
+
+.examCard p strong {
+    color: #333333;
+    font-weight: 600;
+}
+
+.examMenuButton {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    color: #666666;
+    cursor: pointer;
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: var(--transition);
+}
+
+.examMenuButton:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    border-color: rgba(0, 0, 0, 0.05);
+    color: #333;
+}
+
+.examMenu {
+    position: absolute;
+    top: 3rem;
+    right: 0.75rem;
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    z-index: 10;
+    width: 120px;
+}
+
+.examMenuOption {
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    color: #333;
+    cursor: pointer;
+    transition: var(--transition);
+    border: none;
+    background: white;
+    width: 100%;
+    text-align: left;
+}
+
+.examMenuOption:hover {
+    background-color: #f8f9fa;
+}
+
+.examMenuOption--delete {
+    color: var(--danger-color);
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.examMenuOption--delete:hover {
+    background-color: #fff5f5;
+}
+
+.editInput {
+    width: 100%;
+    padding: 0.5rem;
+    font-size: 0.875rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    margin-bottom: 0.75rem;
+    transition: var(--transition);
+}
+
+.editInput:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.examCard label {
+    font-size: 0.875rem;
+    color: #555;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    display: block;
+    text-align: left;
+}
+
+.editButtons {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.saveButton,
+.cancelButton {
+    flex: 1;
+    padding: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.saveButton {
+    background-color: var(--success-color);
+    color: white;
+}
+
+.saveButton:hover {
+    background-color: #218838;
+}
+
+.cancelButton {
+    background-color: #6c757d;
+    color: white;
+}
+
+.cancelButton:hover {
+    background-color: #5a6268;
+}
+
+.saveButton:active,
+.cancelButton:active {
+    transform: scale(0.98);
 }

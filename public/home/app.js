@@ -1,22 +1,21 @@
+import { validateSessionAuth, getSessionID } from "/modules/Security.js";
+
 // API Endpoints
 const API_URL = `${window.location.protocol}//${window.location.hostname}:8080`;
 const API_BASE_URL = `${API_URL}/schedule/me`;
-const sessionID = sessionStorage.getItem('SessionID');
-
-// Redirect to login if no SessionID
-if (!sessionID) {
-    window.location.href = '/public/login/index.html';
-}
 
 // GET request to fetch schedule data
 async function apiGet() {
     const result = await fetch(API_BASE_URL, {
         method: 'GET',
         headers: {
-            'SessionID': sessionID
+            'SessionID': getSessionID()
         }
     });
-    if (!result.ok) throw new Error(`HTTP error! status: ${result.status}`);
+    if (!result.ok) {
+        const errorText = await result.text();
+        throw new Error(`HTTP error! status: ${result.status}, body: ${errorText}`);
+    }
     return result.json();
 }
 
@@ -24,7 +23,7 @@ async function apiDeleteTimeStamp(dayOfWeek, timestampID) {
     const result = await fetch(`${API_BASE_URL}/${dayOfWeek}/${timestampID}`, {
         method: 'DELETE',
         headers: {
-            'SessionID': sessionID
+            'SessionID': getSessionID()
         }
     });
     if (!result.ok) throw new Error(`HTTP error! status: ${result.status}`);
@@ -37,24 +36,23 @@ async function apiCreateTimeStamp(dayOfWeek, type, text) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'SessionID': sessionID
+            'SessionID': getSessionID()
         },
-        body: JSON.stringify({ type, text })
+        body: JSON.stringify({type, text})
     });
     if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
     return await res.json();
 }
 
-async function apiUpdateTimeStamp(dayOfWeek, timestampID, data) {
+async function apiUpdateTimeStamp(dayOfWeek, timestampID, type, text) {
     const res = await fetch(`${API_BASE_URL}/${dayOfWeek}/${timestampID}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
-            'SessionID': sessionID
+            'SessionID': getSessionID()
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify({ type, text })
     });
-    console.log(data);
     if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
     return await res.json();
 }
@@ -63,7 +61,7 @@ async function getSubjects() {
     const res = await fetch(`${API_URL}/subjects`, {
         method: 'GET',
         headers: {
-            'SessionID': sessionID
+            'SessionID': getSessionID()
         }
     });
     if (!res.ok) {
@@ -128,6 +126,7 @@ function createTimeStampElement(dayOfWeek, data) {
     const editButton = document.createElement('button');
     editButton.className = 'editButton';
     editButton.textContent = '⋮';
+
     div.appendChild(editButton);
 
     const options = [];
@@ -152,7 +151,7 @@ function createTimeStampElement(dayOfWeek, data) {
 
                 const restoreSpan = async () => {
                     span.textContent = select.value;
-                    await apiUpdateTimeStamp(dayOfWeek, data.id, { text: select.value });
+                    await apiUpdateTimeStamp(dayOfWeek, data.id, data.type, select.value);
                     data.text = select.value;
                     select.replaceWith(span);
                 };
@@ -176,7 +175,6 @@ function createTimeStampElement(dayOfWeek, data) {
 
     return div;
 }
-
 
 // Load Schedule
 async function loadSchedule() {
@@ -208,7 +206,7 @@ async function addItem(dayOfWeek, type) {
     container.appendChild(createTimeStampElement(dayOfWeek, timestamp));
 }
 
-// Bindings //
+// Bindings
 document.querySelectorAll('.addLesson').forEach(button => {
     button.onclick = e => addItem(e.target.closest('.hoursContainer').id, 'lesson');
 });
@@ -234,4 +232,7 @@ document.getElementById('logoutButton').onclick = () => {
     window.location.href = '/public/login/index.html';
 }
 
-window.addEventListener('DOMContentLoaded', loadSchedule);
+window.addEventListener('DOMContentLoaded', () => {
+    validateSessionAuth();
+    loadSchedule();
+});
