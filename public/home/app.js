@@ -1,5 +1,7 @@
 import { validateSessionAuth, getSessionID } from "/modules/Security.js";
 
+validateSessionAuth();
+
 // API Endpoints
 const API_URL = `${window.location.protocol}//${window.location.hostname}:8080`;
 const API_BASE_URL = `${API_URL}/schedule/me`;
@@ -51,7 +53,7 @@ async function apiUpdateTimeStamp(dayOfWeek, timestampID, type, text) {
             'Content-Type': 'application/json',
             'SessionID': getSessionID()
         },
-        body: JSON.stringify({ type, text })
+        body: JSON.stringify({ type, text })  // Backend erwartet beide Felder
     });
     if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
     return await res.json();
@@ -151,6 +153,7 @@ function createTimeStampElement(dayOfWeek, data) {
 
                 const restoreSpan = async () => {
                     span.textContent = select.value;
+                    // Backend erwartet beide: type und text
                     await apiUpdateTimeStamp(dayOfWeek, data.id, data.type, select.value);
                     data.text = select.value;
                     select.replaceWith(span);
@@ -175,6 +178,7 @@ function createTimeStampElement(dayOfWeek, data) {
 
     return div;
 }
+
 
 // Load Schedule
 async function loadSchedule() {
@@ -206,7 +210,7 @@ async function addItem(dayOfWeek, type) {
     container.appendChild(createTimeStampElement(dayOfWeek, timestamp));
 }
 
-// Bindings
+// Bindings //
 document.querySelectorAll('.addLesson').forEach(button => {
     button.onclick = e => addItem(e.target.closest('.hoursContainer').id, 'lesson');
 });
@@ -233,6 +237,13 @@ document.getElementById('logoutButton').onclick = () => {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-    validateSessionAuth();
+
+    const sessionID = sessionStorage.getItem('SessionID');
+
+    // Redirect to login if no SessionID
+    if (!sessionID) {
+        window.location.href = '/public/login/index.html';
+        return;
+    }
     loadSchedule();
 });

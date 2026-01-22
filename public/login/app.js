@@ -94,7 +94,7 @@ async function handleRegister() {
 
     try {
         await register(username, password);
-        login(username, password)
+        await login(username, password)
         window.location.href = "/public/home";
     } catch (err) {
         feedbackElement.textContent = `Registration error: ${err.body}`;

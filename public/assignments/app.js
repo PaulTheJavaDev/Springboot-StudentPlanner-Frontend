@@ -1,10 +1,10 @@
 import { validateSessionAuth, getSessionID } from "/modules/Security.js";
+import { HOST, ASSIGNMENTS_URL } from "/modules/Config.js";
 
 validateSessionAuth();
 
 // URLs
-const HOST_URL = "http://localhost:8080";
-const API_URL = `${HOST_URL}/assignments/my`;
+const API_URL = ASSIGNMENTS_URL
 
 // Elements
 const assignmentContainer = document.querySelector(".assignmentsContainer");
@@ -12,7 +12,7 @@ const assignmentContainer = document.querySelector(".assignmentsContainer");
 /* returns an String Array */
 async function getSubjects() {
 
-    const request = await fetch(`${HOST_URL}/subjects`, {
+    const request = await fetch(`${HOST}/subjects`, {
 
         method: "GET",
         headers: {

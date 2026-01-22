@@ -1,9 +1,9 @@
 import { validateSessionAuth, getSessionID } from "/modules/Security.js";
+import { HOST, EXAMS_URL } from "/modules/Config.js";
 
 validateSessionAuth();
 
-const API = "http://localhost:8080";
-const EXAMS_API_URL = `${API}/exams/my`;
+const EXAMS_API_URL = EXAMS_URL;
 
 // DOM Elements
 const examsContainer = document.getElementById("examsContainer");
@@ -59,7 +59,7 @@ async function deleteExam(examID) {
 }
 
 async function getSubjects() {
-    return await fetchAPI(`${API}/subjects`);
+    return await fetchAPI(`${HOST}/subjects`);
 }
 
 // UI Helper Functions
@@ -129,8 +129,8 @@ function createMenu(exam, examDiv) {
     const editOption = createEditOption(exam, examDiv);
     const deleteOption = createDeleteOption(exam);
 
-    menu.appendChild(editOption, deleteOption);
-    //menu.appendChild(deleteOption);
+    menu.appendChild(editOption);
+    menu.appendChild(deleteOption);
 
     return menu;
 }
@@ -200,10 +200,6 @@ function createDeleteOption(exam) {
     deleteOption.textContent = "Delete Exam";
 
     deleteOption.addEventListener("click", async () => {
-        if (!confirm(`Are you sure you want to delete the exam for ${exam.subject}?`)) {
-            return;
-        }
-
         try {
             await deleteExam(exam.id);
             await loadExams();
@@ -257,29 +253,36 @@ async function loadSubjects() {
 
 // Submit Button Handler
 submitButton.addEventListener("click", async () => {
-    const selectedSubject = subjectSelect.value;
-    const dueDate = dueDateInput.value;
-    const notes = examNotesInput.value;
+  // Button während der Anfrage deaktivieren
+  if (submitButton.disabled) return;
+  submitButton.disabled = true;
+  
+  const selectedSubject = subjectSelect.value;
+  const dueDate = dueDateInput.value;
+  const notes = examNotesInput.value;
 
-    if (!selectedSubject || !dueDate || !notes.trim()) {
-        showResponseLabel("Please fill in all fields");
-        return;
-    }
+  if (!selectedSubject || !dueDate || !notes.trim()) {
+    showResponseLabel("Please fill in all fields");
+    submitButton.disabled = false;
+    return;
+  }
 
-    const examData = {
-        subject: selectedSubject,
-        dueDate: dueDate,
-        notes: notes
-    };
+  const examData = {
+    subject: selectedSubject,
+    dueDate: dueDate,
+    notes: notes
+  };
 
-    try {
-        await createExam(examData);
-        clearForm();
-        await loadExams();
-    } catch (error) {
-        showResponseLabel("Error creating exam");
-        console.error("Create exam error:", error);
-    }
+  try {
+    await createExam(examData);
+    clearForm();
+    await loadExams();
+  } catch (error) {
+    showResponseLabel("Error creating exam");
+    console.error("Create exam error:", error);
+  } finally {
+    submitButton.disabled = false; // Button wieder aktivieren
+  }
 });
 
 // Close menus when clicking outside
