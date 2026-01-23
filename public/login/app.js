@@ -1,5 +1,11 @@
+import { getSessionID } from "/modules/Security.js";
+
 const baseUrl = "http://localhost:8080/auth";
-let sessionID = null;
+let sessionID = getSessionID();
+
+if (sessionID !== null) {
+    window.location.href = "../home/index.html";
+}
 
 async function login(username, password) {
     const loginURL = `${baseUrl}/login`;

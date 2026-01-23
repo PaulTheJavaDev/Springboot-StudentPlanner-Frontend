@@ -5,19 +5,22 @@
     --font: bold 1rem -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
     --border-color: #e5e7eb;
     --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.06);
-    --shadow-md: 0 8px 16px rgba(0, 0, 0, 0.1);
-    --shadow-lg: 0 12px 24px rgba(0, 0, 0, 0.12);
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.12);
 }
 
-/* Top Bar */
 .topBar {
+    position: relative;
     display: flex;
-    justify-content: space-between;
     align-items: center;
     padding: 1.5rem 2.5rem;
     border-bottom: 1px solid var(--border-color);
-    background: linear-gradient(to bottom, #ffffff, #fafbfc);
+    background: linear-gradient(to bottom, #ffffff, #f8f8f8);
     box-shadow: var(--shadow-sm);
+}
+
+.navRight {
+    margin-left: auto;
 }
 
 .navCurrent {
@@ -25,14 +28,49 @@
     color: #6b7280;
     text-decoration: none;
     pointer-events: none;
-    font: 0.875rem -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+    font: var(--font);
+    font-size: 0.875rem;
     padding: 0.4rem 0.8rem;
     background-color: #f3f4f6;
     border-radius: 6px;
 }
 
-.logoutButton {
-    font: 600 0.9rem -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+.logoutButton:active {
+    transform: translateY(0);
+}
+
+.PageTitle {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0;
+    font: bold 2.5rem -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+    color: #111827;
+    pointer-events: none;
+}
+
+/* Navigation buttons */
+.buttonContainer {
+    margin: auto;
+    margin-top: 0.5rem;
+    width: 18rem;
+    text-align: center;
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 2.5rem;
+}
+
+.logoutButton,
+.assignmentsButton,
+.examsButton {
+    text-align: center;
+    width: 8rem;
+    margin: auto;
+    
+    font: var(--font);
+    font-style: bold;
+    font-size: 0.9rem;
+
     border-radius: 8px;
     cursor: pointer;
     padding: 0.5rem 1.2rem;
@@ -42,32 +80,17 @@
     box-shadow: var(--shadow-sm);
 }
 
-.logoutButton:hover {
-    background-color: #f9fafb;
-    border-color: #9ca3af;
-    transform: translateY(-1px);
+/* This should overwwrite the previous given width */
+.logoutButton {
+    width: 6rem;
+}
+
+.logoutButton:hover,
+.assignmentsButton:hover,
+.examsButton:hover {
+    transform: translateY(-4px);
     box-shadow: var(--shadow-md);
-}
-
-.logoutButton:active {
-    transform: translateY(0);
-}
-
-/* Page */
-.PageTitle {
-    text-align: center;
-    font: bold 2.5rem -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
-    margin-bottom: 2rem;
-    color: #111827;
-    letter-spacing: -0.5px;
-}
-
-/* Navigation buttons */
-.buttonContainer {
-    display: flex;
-    justify-content: center;
-    gap: 1.5rem;
-    margin-bottom: 2.5rem;
+    border-color: #dbdbdb;
 }
 
 /* Days */
@@ -100,12 +123,13 @@
 
 .hoursContainer:hover {
     box-shadow: var(--shadow-lg);
-    transform: translateY(-4px);
     border-color: #d1d5db;
 }
 
 .DayHeader {
-    font: bold 1.4rem -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+    font: var(--font);
+    font-size: 1.4rem;
+    font-style: bold;
     color: #111827;
     margin-bottom: 0.75rem;
     letter-spacing: -0.3px;
@@ -124,7 +148,6 @@
     position: relative;
     box-shadow: var(--shadow-sm);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border: 2px solid transparent;
 }
 
 .lesson:hover,
@@ -180,7 +203,7 @@
     border-radius: 10px;
     cursor: pointer;
     padding: 0.6rem 1.2rem;
-    border: 2px solid transparent;
+    border: 2px solid var(--border-color);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: var(--shadow-sm);
 }

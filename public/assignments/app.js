@@ -3,272 +3,301 @@ import { HOST, ASSIGNMENTS_URL } from "/modules/Config.js";
 
 validateSessionAuth();
 
-// URLs
-const API_URL = ASSIGNMENTS_URL
+const elements = {
+  container: document.querySelector(".assignmentsContainer"),
+  response: document.getElementById("responseLabel"),
+  responder: document.getElementById("assignmentsResponder"),
+  subject: document.getElementById("subjectSelect"),
+  dueDate: document.getElementById("dueDateInput"),
+  notes: document.getElementById("assignmentNotes"),
+  submit: document.getElementById("submitAssignment")
+};
 
-// Elements
-const assignmentContainer = document.querySelector(".assignmentsContainer");
-
-/* returns an String Array */
-async function getSubjects() {
-
-    const request = await fetch(`${HOST}/subjects`, {
-
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json"
-        }
-
-    });
-
-    if (!request.ok) {
-        throw new Error(`HTTP error! status: ${request.status}`);
+// API CRUD Operations
+const fetchAllAssignments = async () => {
+  const response = await fetch(ASSIGNMENTS_URL, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "SessionID": getSessionID()
     }
+  });
+  return response.json();
+};
 
-    return await request.json();
+const createAssignment = async (assignmentData) => {
+  const response = await fetch(ASSIGNMENTS_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "SessionID": getSessionID()
+    },
+    body: JSON.stringify(assignmentData)
+  });
 
-}
+  if (!response.ok && (response.status === 400 || response.status === 422)) {
+    showMessage("Please enter a valid future date!", 2);
+    return;
+  }
 
-// returns an Assignment Array
-async function getAssignments() {
+  return response.json();
+};
 
-    const request = await fetch(API_URL, {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json",
-            "SessionID": getSessionID()
-        }
-    });
+const updateAssignment = async (assignmentId, assignmentData) => {
+  const response = await fetch(`${ASSIGNMENTS_URL}/${assignmentId}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      "SessionID": getSessionID()
+    },
+    body: JSON.stringify(assignmentData)
+  });
+  return response.json();
+};
 
-    if (!request.ok) {
-        throw new Error(`HTTP error! status: ${request.status}`);
+const deleteAssignment = async (assignmentId) => {
+  const response = await fetch(`${ASSIGNMENTS_URL}/${assignmentId}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      "SessionID": getSessionID()
     }
+  });
+  return response.ok;
+};
 
-    return await request.json();
-
-}
-
-// returns the created Assignment
-async function createAssignmentMetaData(body) {
-
-    const request = await fetch(`${API_URL}`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "SessionID": getSessionID()
-        },
-        body: JSON.stringify(body)
-    });
-
-    if (!request.ok) {
-        if (request.status === 400 || request.status === 422) {
-            const errorData = await request.json().catch(() => ({}));
-            const message = errorData.message || "Please enter a valid future date!";
-            responseLabelHandler(message, 2);
-            return null;
-        } else {
-            throw new Error(`HTTP error! status: ${request.status}`);
-        }
+const fetchSubjects = async () => {
+  const response = await fetch(`${HOST}/subjects`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "SessionID": getSessionID()
     }
+  });
+  return response.json();
+};
 
-    return await request.json();
-}
+const showMessage = (message, seconds = 2) => {
+  elements.response.textContent = message;
+  setTimeout(() => {
+    elements.response.textContent = "";
+  }, seconds * 1000);
+};
 
-// returns the updated Assignment
-async function updateAssignment(assignmentId, body) {
+const formatDate = (date) => new Date(date).toLocaleDateString();
+const getDate = (date) => date.split("T")[0];
 
-    const request = await fetch(`${API_URL}/${assignmentId}`, {
+const createElement = (tag, className, html, attributes = {}) => {
+  const element = document.createElement(tag);
 
-        method: "PUT",
-        headers: {
-            "Content-Type": "application/json",
-            "SessionID": getSessionID()
-        },
-        body: JSON.stringify(body)
+  if (className) {
+    element.className = className;
+  }
 
-    });
+  if (html) {
+    element.innerHTML = html;
+  }
 
-    if (!request.ok) {
-        throw new Error(`HTTP error! status: ${request.status}`);
+  Object.entries(attributes).forEach(
+    ([key, value]) => element[key] = value
+  );
+
+  return element;
+};
+
+const createField = (label, value, inputType, key) => {
+  const wrapper = createElement("p", `assignment-${key}`);
+  wrapper.innerHTML = `<strong>${label}:</strong> `;
+  
+  const text = createElement("span");
+  text.textContent = inputType === "date" ? formatDate(value) : value;
+  
+  const input = createElement(inputType === "date" ? "input" : "textarea");
+
+  if (inputType === "date") {
+    input.type = "date";
+    input.value = getDate(value);
+  } else {
+    input.value = value;
+  }
+
+  input.style.cssText = "width:100%;min-height:60px;border:1px solid #ccc;padding:5px;border-radius:6px";
+  input.style.display = "none";
+  
+  wrapper.append(text, input);
+  return { wrap: wrapper, text, input };
+};
+
+const toggleEdit = (state, fieldElements) => {
+  state.isEdit = !state.isEdit;
+  
+  fieldElements.subject.contentEditable = state.isEdit;
+  fieldElements.subject.style.cssText = state.isEdit ? "cursor:text;border:1px solid #ccc;padding:5px;border-radius:6px" : "";
+  
+  [fieldElements.dueDate, fieldElements.notes].forEach(
+    ({ text, input }) => {
+      text.style.display = state.isEdit ? "none" : "inline";
+      input.style.display = state.isEdit ? (input.tagName === "TEXTAREA" ? "block" : "inline") : "none";
     }
+  );
+  
+  fieldElements.completedCheckbox.style.display = state.isEdit ? "flex" : "none";
+  fieldElements.completedText.style.display = state.isEdit ? "none" : "block";
+  state.saveButton.style.display = state.isEdit ? "block" : "none";
+};
 
-    return await request.json();
+const saveEdit = async (assignment, fieldElements) => {
+  const subject = fieldElements.subject.textContent.trim();
+  const dueDate = fieldElements.dueDate.input.value;
+  const notes = fieldElements.notes.input.value.trim();
+  const completed = fieldElements.completedCheckbox.checked;
+  
+  if (!subject || !dueDate || !notes) {
+    showMessage("Please fill in all fields.", 1.5);
+    return false;
+  }
+  
+  Object.assign(assignment, { subject, dueDate, notes, completed });
+  await updateAssignment(assignment.id, assignment);
+  
+  fieldElements.dueDate.text.textContent = formatDate(assignment.dueDate);
+  fieldElements.notes.text.textContent = assignment.notes;
+  fieldElements.completedText.innerHTML = `<strong>Completed:</strong> ${assignment.completed}`;
 
-}
+  return true;
+};
 
-// deletes the assignment
-async function deleteAssignment(assignmentId) {
+const showMenu = (wrapper, assignment, fieldElements, state) => {
+  const existing = document.querySelector(".assignment-popup");
+  if (existing) {
+    return existing.remove();
+  }
+  
+  const popup = createElement("div", "assignment-popup");
 
-    const request = await fetch(`${API_URL}/${assignmentId}`, {
-        method: "DELETE",
-        headers: {
-            "Content-Type": "application/json",
-            "SessionID": getSessionID()
-        }
-    });
+  const editButton = createElement("button", null, "Edit");
+  editButton.onclick = () => {
+    toggleEdit(state, fieldElements);
+    popup.remove();
+  };
 
-}
-
-// Utils - Helpers //
-
-function createLabeledParagraph(label, value, className) {
-    const element = document.createElement("p");
-    if (className) element.classList.add(className);
-
-    element.innerHTML = `<strong>${label}:</strong> ${value}`;
-    return element;
-}
-
-function responseLabelHandler(responseText, durationInSeconds) {
-
-    durationInSeconds = durationInSeconds || 2;
-    durationInSeconds = durationInSeconds * 1000;
-    const responseLabel = document.getElementById("responseLabel");
-    responseLabel.textContent = responseText;
-    setTimeout(() => {
-        responseLabel.textContent = "";
-    }, durationInSeconds);
-}
-
-// Assignment Element Creation
-function createAssignmentElement(data) {
-
-    const wrapper = document.createElement("div");
-    wrapper.classList.add("assignment");
-
-    const subject = document.createElement("h3");
-    subject.classList.add("assignment-subject");
-    subject.textContent = data.subject;
-
-    const dueDate = createLabeledParagraph("Due date", new Date(data.dueDate).toLocaleDateString(), "assignment-due-date");
-    const notes = createLabeledParagraph("Notes", data.notes, "assignment-notes");
-    const completed = createLabeledParagraph("Completed", data.completed, "assignment-completed");
-
-    // Menu (Delete and Toggle Completed)
-    const menu = document.createElement("button");
-    menu.className = "assignment-menu-button";
-    menu.textContent = "⋮";
-    wrapper.style.position = "relative";
-
-    menu.onclick = async () => {
-        // Popup with 2 options: Toggle Completed and Delete
-
-        let existingPopup = document.querySelector(".assignment-popup");
-        if (existingPopup) {
-            existingPopup.remove();
-            return;
-        }
-
-        const popup = document.createElement("div");
-        popup.classList.add("assignment-popup");
-
-        const toggleCompletedButton = document.createElement("button");
-        toggleCompletedButton.textContent = data.completed ? "Mark Incomplete" : "Mark Complete";
-
-        toggleCompletedButton.onclick = async () => {
-            data.completed = !data.completed;
-            await updateAssignment(data.id, { subject: data.subject, dueDate: data.dueDate, notes: data.notes, completed: data.completed });
-            completed.innerHTML = `<strong>Completed:</strong> ${data.completed}`;
-            document.body.removeChild(popup);
-        };
-
-
-        const deleteButton = document.createElement("button");
-        deleteButton.textContent = "Delete Assignment";
-
-        deleteButton.onclick = async () => {
-            await deleteAssignment(data.id);
-            assignmentContainer.removeChild(wrapper);
-            document.body.removeChild(popup);
-        };
-
-        popup.appendChild(toggleCompletedButton);
-        popup.appendChild(deleteButton);
-        wrapper.appendChild(popup);
-
-    };
-    // Append all elements to wrapper
-    wrapper.append(subject, dueDate, notes, completed);
-    wrapper.appendChild(menu);
-
-    return wrapper;
-}
-
-// Loading //
-
-async function loadAssignmentElements() {
-
-    try {
-        const assignments = await getAssignments();
-        assignments.forEach(assignment => {
-            assignmentContainer.appendChild(
-                createAssignmentElement(assignment)
-            );
-        });
-    } catch (error) {
-        console.error("Error loading assignments:", error);
+  const deleteButton = createElement("button", null, "Delete Assignment");
+  deleteButton.onclick = async () => {
+    const success = await deleteAssignment(assignment.id);
+    if (success) {
+      elements.container.removeChild(wrapper);
+      popup.remove();
     }
+  };
+  
+  popup.append(editButton, deleteButton);
+  wrapper.appendChild(popup);
+};
+
+
+
+const createCard = (assignment) => {
+  const wrapper = createElement("div", "assignment");
+  wrapper.style.position = "relative";
+  
+  const subject = createElement("h3", "assignment-subject", assignment.subject);
+  const dueDate = createField("Due date", assignment.dueDate, "date", "due-date");
+  const notes = createField("Notes", assignment.notes, "textarea", "notes");
+  
+  const completedText = createElement("p", "assignment-completed", `<strong>Completed:</strong> ${assignment.completed}`);
+  
+  const completedCheckbox = createElement("label");
+  completedCheckbox.style.cssText = "display:none;align-items:center;gap:0.5rem;font-size:0.9rem";
+  const checkbox = createElement("input");
+  checkbox.type = "checkbox";
+  checkbox.checked = assignment.completed;
+  completedCheckbox.innerHTML = "<strong>Completed:</strong> ";
+  completedCheckbox.appendChild(checkbox);
+  
+  const state = { isEdit: false };
+  
+  const saveButton = createElement("button", "assignment-save-button", "Save");
+  saveButton.style.cssText = "display:none;margin-top:0.5rem;padding:0.4rem 0.8rem;border-radius:6px;border:1px solid #ccc;background:white;cursor:pointer";
+  state.saveButton = saveButton;
+  
+  const fieldElements = { subject, dueDate, notes, completedCheckbox: checkbox, completedText };
+
+  const ableToSaveAssignment = (fieldElements) => {
+
+  const subject = fieldElements.subject.textContent.trim();
+  const dueDate = fieldElements.dueDate.input.value;
+  const notes = fieldElements.notes.input.value.trim();
+
+  if (!subject || !dueDate || !notes) {
+    showMessage("Please fill in all fields.", 1.5);
+    return false;
+  }
+
+  return true;
 }
-
-async function loadSubjects() {
-
-    const subjectSelect = document.getElementById("subjectSelect");
-    try {
-        const subjects = await getSubjects();
-
-        subjects.forEach(subject => {
-            const option = document.createElement("option");
-            option.className = "subjectOption";
-            option.value = subject;
-            //option.textContent = subject;
-            subjectSelect.appendChild(option);
-        });
-    } catch (error) {
-        console.error("Error loading subjects:", error);
+  
+  saveButton.onclick = async () => {
+    if (ableToSaveAssignment(fieldElements)) {
+      const success = await saveEdit(assignment, fieldElements);
+      if (success) {
+        toggleEdit(state, fieldElements);
+      } else {
+        checkbox.checked = assignment.completed;
+      }
+    } else {
+      checkbox.checked = assignment.completed;
     }
-}
+  };
+  
+  const menuBtn = createElement("button", "assignment-menu-button", "⋮");
+  menuBtn.onclick = () => showMenu(wrapper, assignment, fieldElements, state);
+  
+  wrapper.append(subject, dueDate.wrap, notes.wrap, completedText, completedCheckbox, saveButton, menuBtn);
+  return wrapper;
+};
 
-// Handling //
+const noAssignmentsCheck = (length) => {
+  if (length === 0) {
+    elements.responder.textContent = "No Assignments yet";
+  } else {
+    elements.responder.textContent = "";
+  }
+};
 
-// Form Submission
-async function handleAssignmentFormSubmit(body) {
-    
-    try {
-        const newAssignment = await createAssignmentMetaData(body);
-        assignmentContainer.appendChild(
-            createAssignmentElement(newAssignment)
-        );
-    } catch (error) {
-        console.error("Error creating assignment:", error);
-        return;
-    }
+const loadAssignments = async () => {
+  const assignments = await fetchAllAssignments();
+  noAssignmentsCheck(assignments.length);
+  assignments.forEach(assignment => elements.container.appendChild(createCard(assignment)));
+};
 
-    console.log("Form successfully submitted with data:", body);
+const loadSubjects = async () => {
+  const subjects = await fetchSubjects();
+  subjects.forEach(subject => elements.subject.appendChild(createElement("option", "subjectOption", subject, { value: subject })));
+};
 
-}
-// Submit Button Click
-document.getElementById("submitAssignment").onclick = () => {
-    
-    const subject = document.getElementById('subjectSelect').value.toUpperCase().replace(" ", "_");
-    const dueDate = document.getElementById('dueDateInput').value;
-    const notes = document.getElementById('assignmentNotes').value;
-    const completed = false;
+const handleSubmit = async () => {
+  const assignmentData = {
+    subject: elements.subject.value.toUpperCase().replace(" ", "_"),
+    dueDate: elements.dueDate.value,
+    notes: elements.notes.value,
+    completed: false
+  };
+  
+  if (!assignmentData.subject || !assignmentData.dueDate || !assignmentData.notes) {
+    return showMessage("Please fill in all fields.", 1.5);
+  }
+  
+  const newAssignment = await createAssignment(assignmentData);
+  if (newAssignment) {
+    elements.responder.textContent = "";
+    elements.container.appendChild(createCard(newAssignment));
+    [elements.subject, elements.dueDate, elements.notes].forEach(element => element.value = "");
+  }
 
-    if (!subject || !dueDate || !notes) {
-        responseLabelHandler("Please fill in all fields.", 1.5);
-        return;
-    }
+};
 
-    handleAssignmentFormSubmit({
-        subject,
-        dueDate,
-        completed,
-        notes
-    });
-}
-
-// Initial Load //
+elements.submit.onclick = handleSubmit;
 window.addEventListener("DOMContentLoaded", () => {
-    loadAssignmentElements();
-    loadSubjects();
+  loadAssignments();
+  loadSubjects();
 });
