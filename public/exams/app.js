@@ -1,5 +1,6 @@
 import { validateSessionAuth, getSessionID } from "/modules/Security.js";
 import { HOST, EXAMS_URL } from "/modules/Config.js";
+import { checkTextForSymbols } from "/modules/TextSecurity.js";
 
 validateSessionAuth();
 
@@ -11,7 +12,8 @@ const subjectSelect = document.getElementById("subjectSelect");
 const dueDateInput = document.getElementById("dueDateInput");
 const examNotesInput = document.getElementById("examNotes");
 const submitButton = document.getElementById("submitExam");
-const responseLabelElement = document.getElementById("responseLabel");
+const createExamResponseLabel = document.getElementById("responseLabel");
+const feedbackElement = document.getElementById("feedbackElement");
 
 // API Calls
 async function fetchAPI(url, options = {}) {
@@ -26,7 +28,7 @@ async function fetchAPI(url, options = {}) {
     });
 
     if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        feedbackElement.textContent = "Something went wrong.";
     }
 
     const text = await response.text();
@@ -63,10 +65,17 @@ async function getSubjects() {
 }
 
 // UI Helper Functions
-function showResponseLabel(message, duration = 2) {
-    responseLabelElement.textContent = message;
+function showResponseLabel(message, duration = 2, type) {
+
+    if (type == "HTML") {
+        createExamResponseLabel.innerHTML = message
+    } else {
+        createExamResponseLabel.textContent = message;
+    }
+
     setTimeout(() => {
-        responseLabelElement.textContent = "";
+        createExamResponseLabel.textContent = "";
+        createExamResponseLabel.innerHTML = "";
     }, duration * 1000);
 }
 
@@ -86,9 +95,18 @@ function createExamCard(exam) {
     examDiv.className = "examCard";
     examDiv.dataset.examId = exam.id;
 
+    // Correctly displaying //
+    const subjectFormatted = exam.subject
+    .toLowerCase()
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, char => char.toUpperCase());
+
+    const dueDateFormatted = exam.dueDate
+    .replace(/-/g, ".");
+
     examDiv.innerHTML = `
-        <h3>${exam.subject}</h3>
-        <p>Due Date: ${exam.dueDate}</p>
+        <h3>${subjectFormatted}</h3>
+        <p>Due Date: ${dueDateFormatted}</p>
         <p>Notes: ${exam.notes}</p>
     `;
 
@@ -104,8 +122,8 @@ function createMenuButton(exam, examDiv) {
     menuButton.className = "examMenuButton";
     menuButton.textContent = "⋮";
 
-    menuButton.addEventListener("click", (e) => {
-        e.stopPropagation();
+    menuButton.addEventListener("click", (event) => {
+        event.stopPropagation();
         
         const existingMenu = examDiv.querySelector(".examMenu");
         if (existingMenu) {
@@ -219,7 +237,7 @@ async function loadExams() {
         const exams = await getExams();
 
         if (exams.length === 0) {
-            examsContainer.innerHTML = '<p class="noExams">No exams yet.<br> Create one to the left!</p>';
+            examsContainer.innerHTML = '<p class="noExams">No exams yet</p>';
             return;
         }
 
@@ -253,17 +271,22 @@ async function loadSubjects() {
 
 // Submit Button Handler
 submitButton.addEventListener("click", async () => {
-  // Button während der Anfrage deaktivieren
-  if (submitButton.disabled) return;
-  submitButton.disabled = true;
   
-  const selectedSubject = subjectSelect.value;
+  const selectedSubject = subjectSelect.value.toUpperCase().replace(" ", "_");
   const dueDate = dueDateInput.value;
   const notes = examNotesInput.value;
 
   if (!selectedSubject || !dueDate || !notes.trim()) {
     showResponseLabel("Please fill in all fields");
-    submitButton.disabled = false;
+    return;
+  }
+
+  // Checking for Injection
+  const containsSymbols = checkTextForSymbols(notes);
+
+  if (containsSymbols) {
+    //showResponseLabel(`Invalid Symbols. <br>Please use normal characters.`);
+    showResponseLabel("Invalid Symbols. <br>Please use normal characters.", 2, "HTML");
     return;
   }
 
@@ -280,8 +303,6 @@ submitButton.addEventListener("click", async () => {
   } catch (error) {
     showResponseLabel("Error creating exam");
     console.error("Create exam error:", error);
-  } finally {
-    submitButton.disabled = false; // Button wieder aktivieren
   }
 });
 

@@ -1,10 +1,12 @@
 import { validateSessionAuth, getSessionID } from "/modules/Security.js";
+import { HOME_URL } from "/modules/Config.js";
 
 validateSessionAuth();
 
 // API Endpoints
-const API_URL = `${window.location.protocol}//${window.location.hostname}:8080`;
-const API_BASE_URL = `${API_URL}/schedule/me`;
+const API_BASE_URL = HOME_URL;
+
+const feedbackElement = document.getElementById("responseLabel")
 
 // GET request to fetch schedule data
 async function apiGet() {
@@ -16,7 +18,7 @@ async function apiGet() {
     });
     if (!result.ok) {
         const errorText = await result.text();
-        throw new Error(`HTTP error! status: ${result.status}, body: ${errorText}`);
+        feedbackElement.textContent = "Could't get Scheduler: " + errorText;
     }
     return result.json();
 }
@@ -28,7 +30,9 @@ async function apiDeleteTimeStamp(dayOfWeek, timestampID) {
             'SessionID': getSessionID()
         }
     });
-    if (!result.ok) throw new Error(`HTTP error! status: ${result.status}`);
+    if (!result.ok) {
+        throw new Error(`HTTP error! status: ${result.status}`);
+    }
     console.log("Successfully deleted timestamp");
 }
 

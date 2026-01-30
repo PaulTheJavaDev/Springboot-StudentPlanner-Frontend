@@ -1,12 +1,12 @@
 :root {
-    --link-color: #838383;
-    --primary-color: #007bff;
-    --danger-color: #dc3545;
-    --success-color: #28a745;
+    --cornerRadius: 14px;
+    --font: bold 1rem -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
     --border-color: #ccc;
-    --shadow-sm: 2px 2px 6px rgba(0, 0, 0, 0.1);
-    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.15);
-    --transition: all 0.2s ease;
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.12);
+    --tansition-time: 0.25s;
+    --transition: width var(--tansition-time), height var(--tansition-time), background-color var(--tansition-time), transform var(--tansition-time), box-shadow var(--tansition-time);
 }
 
 * {
@@ -16,29 +16,51 @@
 }
 
 body {
-    font-family: Arial, Helvetica, sans-serif;
+    font: var(--font);
     background-color: white;
 }
 
 .topBar {
+    position: relative;
     display: flex;
-    justify-content: flex-end;
-    gap: 0.25rem;
-    padding: 1.5rem 2rem;
-    background-color: white;
+    align-items: center;
+    padding: 1.5rem 2.5rem;
+    border-bottom: 1px solid var(--border-color);
+    background: linear-gradient(to bottom, #ffffff, #f8f8f8);
     box-shadow: var(--shadow-sm);
 }
 
-.navLink,
+#feedbackElement {
+    width: 100%;
+    padding: 1rem 1.5rem;
+    font-weight: 600;
+    text-align: center;
+}
+
+/* Navigation */
 .navCurrent {
-    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.9rem;
+    color: #6b7280;
+    text-decoration: none;
+    pointer-events: none;
+    font: var(--font);
     font-size: 0.875rem;
-    color: var(--link-color);
-    text-decoration: underline;
+    padding: 0.4rem 0.8rem;
+    background-color: #f3f4f6;
+    border-radius: 6px;
 }
 
 .navLink {
-    transition: var(--transition);
+    font: var(--font);
+    font-size: 0.875rem;
+    color: #6b7280;
+    text-decoration: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+.navLink:hover {
+    background-color: #f3f4f6;
 }
 
 .navLink:hover {
@@ -51,13 +73,27 @@ body {
     font-weight: 600;
 }
 
+.navRight {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.navDivider {
+    color: var(--border-color);
+    font-size: 0.875rem;
+}
+
 /* Titles */
 .PageTitle {
-    text-align: center;
-    font-family: Arial, Helvetica, sans-serif;
-    margin: 2rem 0 1rem;
-    font-size: 2rem;
-    color: black;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0;
+    font: bold 2.5rem -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+    color: #111827;
+    pointer-events: none;
 }
 
 .creatorTitle {
@@ -112,14 +148,15 @@ body {
 .noExams {
     width: 100%;
     text-align: center;
-    color: var(--link-color);
-    font-family: Arial, Helvetica, sans-serif;
+    color: #aaa;
+    font: var(--font);
     font-size: 1rem;
     padding: 3rem;
 }
 
 .responseLabel {
-    font: 0.875rem Arial, Helvetica, sans-serif;
+    font: var(--font);
+    font-size: 0.875rem;
     color: var(--danger-color);
     min-height: 1.25rem;
     font-weight: 600;
@@ -133,7 +170,7 @@ body {
     height: 2.5rem;
     padding: 0.5rem;
 
-    font-family: Arial, Helvetica, sans-serif;
+    font: var(--font);
     font-size: 0.875rem;
     text-align: center; 
 
@@ -156,6 +193,7 @@ body {
     min-height: 4rem;
 }
 
+/* ExamcardCreator submit button */
 .submitExam {
     width: 100%;
     height: 2.5rem;
@@ -163,28 +201,32 @@ body {
     padding: 0.5rem;
     margin-top: 0.5rem;
 
-    font-family: Arial, Helvetica, sans-serif;
+    font: var(--font);
     font-size: 0.875rem;
     font-weight: 600;
 
     text-align: center;
     background-color: var(--link-color);
-    color: white;
-    border: none;
+    color: black;
+    background-color: white;
+    border: 1px solid var(--border-color);
     border-radius: 6px;
 
+    box-shadow: var(--shadow-sm);
     transition: var(--transition);
 }
 
 .submitExam:hover {
     cursor: pointer;
-    transform: rotate(-1deg);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
 }
 
 .submitExam:active {
     transform: scale(0.99);
 }
 
+/* Examcard */
 .examCard {
 
     position: relative;
@@ -195,7 +237,7 @@ body {
     min-height: 180px;
 
     background: white;
-    font: 14px Arial, Helvetica, sans-serif;
+    font: var(--font);
     border: 1px solid var(--border-color);
     border-radius: 10px;
     box-shadow: var(--shadow-sm);
@@ -208,7 +250,7 @@ body {
     transform: translateY(-1px);
 }
 
-/* h3 Header in the examcard */
+/* Examcard Header */
 .examCard h3 {
     font-size: 1rem;
     color: black;
@@ -217,6 +259,7 @@ body {
 }
 
 .examCard p {
+    font: var(--font);
     font-size: 1rem;
     color: #555555;
     margin-bottom: 0.5rem;

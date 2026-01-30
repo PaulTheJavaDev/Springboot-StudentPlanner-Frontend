@@ -107,7 +107,7 @@ const createElement = (tag, className, html, attributes = {}) => {
 
 const createField = (label, value, inputType, key) => {
   const wrapper = createElement("p", `assignment-${key}`);
-  wrapper.innerHTML = `<strong>${label}:</strong> `;
+  wrapper.innerHTML = `${label}: `;
   
   const text = createElement("span");
   text.textContent = inputType === "date" ? formatDate(value) : value;
@@ -162,7 +162,7 @@ const saveEdit = async (assignment, fieldElements) => {
   
   fieldElements.dueDate.text.textContent = formatDate(assignment.dueDate);
   fieldElements.notes.text.textContent = assignment.notes;
-  fieldElements.completedText.innerHTML = `<strong>Completed:</strong> ${assignment.completed}`;
+  fieldElements.completedText.innerHTML = `Completed: ${assignment.completed}`;
 
   return true;
 };
@@ -204,14 +204,14 @@ const createCard = (assignment) => {
   const dueDate = createField("Due date", assignment.dueDate, "date", "due-date");
   const notes = createField("Notes", assignment.notes, "textarea", "notes");
   
-  const completedText = createElement("p", "assignment-completed", `<strong>Completed:</strong> ${assignment.completed}`);
+  const completedText = createElement("p", "assignment-completed", `Completed: ${assignment.completed}`);
   
   const completedCheckbox = createElement("label");
   completedCheckbox.style.cssText = "display:none;align-items:center;gap:0.5rem;font-size:0.9rem";
   const checkbox = createElement("input");
   checkbox.type = "checkbox";
   checkbox.checked = assignment.completed;
-  completedCheckbox.innerHTML = "<strong>Completed:</strong> ";
+  completedCheckbox.innerHTML = "Completed: ";
   completedCheckbox.appendChild(checkbox);
   
   const state = { isEdit: false };

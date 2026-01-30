@@ -1,35 +1,41 @@
 import { getSessionID } from "/modules/Security.js";
+import { LOGIN_URL, REGISTER_URL } from "/modules/Config.js";
 
-const baseUrl = "http://localhost:8080/auth";
 let sessionID = getSessionID();
 
+// User is logged in
 if (sessionID !== null) {
     window.location.href = "../home/index.html";
 }
 
 async function login(username, password) {
-    const loginURL = `${baseUrl}/login`;
-    const result = await fetch(loginURL, {
+    
+    try {
+        const result = await fetch(LOGIN_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password })
-    });
+        });
+    
+        if (!result.ok) {
+            feedbackElement.textContent = "Login failed: " + result.statusText;
+            return;
+        }
+    
+        const data = await result.json();
+        sessionID = data.sessionID;
+        sessionStorage.setItem("SessionID", data.sessionID);
 
-    if (!result.ok) {
-        throw new Error("Login failed: " + result.statusText);
+    } catch (error) {
+        feedbackElement.textContent = "Something went wrong.";
     }
-
-    const data = await result.json();
-    sessionID = data.sessionID;
-    sessionStorage.setItem("SessionID", data.sessionID);
     return;
 }
 
 async function register(username, password) {
-    const registerURL = `${baseUrl}/register`;
 
     try {
-        const result = await fetch(registerURL, {
+        const result = await fetch(REGISTER_URL, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ username, password })
@@ -38,19 +44,20 @@ async function register(username, password) {
         console.log("Response Status:", result.status, result.statusText);
 
         const data = await result.text().catch(() => {
-            console.log("Response could not be parsed.");
-            return null;
+            feedbackElement.textContent = "Response could not be parsed.";
+            return;
         });
 
         console.log("Data received:", data);
 
         if (!result.ok) {
-            throw new Error(`Registration failed: ${data}`);
+            feedbackElement.textContent = "Registration failed: ${data}";
+            return;
         }
 
         return { message: data };
     } catch (error) {
-        throw error;
+        feedbackElement.textContent = "Something went wrong.";
     }
 }
 
@@ -75,8 +82,8 @@ async function handleLogin() {
     try {
         await login(username, password);
         window.location.href = "/public/home";
-    } catch (err) {
-        feedbackElement.textContent = `Login error: ${err.body}`;
+    } catch (error) {
+        feedbackElement.textContent = "Login error occured.";
     }
 }
 
@@ -85,16 +92,11 @@ async function handleRegister() {
     const passwordElement = document.getElementById("authPassword");
     const feedbackElement = document.getElementById("authFeedback");
 
-    if (!usernameElement || !passwordElement || !feedbackElement) {
-        console.error("Required elements not found!");
-        return;
-    }
-
     const username = usernameElement.value.trim();
     const password = passwordElement.value.trim();
 
     if (!username || !password) {
-        feedbackElement.textContent = "Please enter both username and password";
+        feedbackElement.textContent = "Please enter both username and password.";
         return;
     }
 
@@ -103,7 +105,7 @@ async function handleRegister() {
         await login(username, password)
         window.location.href = "/public/home";
     } catch (err) {
-        feedbackElement.textContent = `Registration error: ${err.body}`;
+        feedbackElement.textContent = "Registration error";
         return;
     }
 }
@@ -111,11 +113,6 @@ async function handleRegister() {
 function bindUI() {
     const loginBtn = document.getElementById("loginBtn");
     const registerBtn = document.getElementById("registerBtn");
-
-    if (!loginBtn || !registerBtn) {
-        console.error("Buttons not found!");
-        return;
-    }
 
     loginBtn.addEventListener("click", () => handleLogin());
     registerBtn.addEventListener("click", () => handleRegister());
